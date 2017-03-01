@@ -1,0 +1,9 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/Flogger.Core/obj/Debug
+/Flogger.Core/bin/Debug
+/Flogger.Core/packages
+/Flogger.Web/bin/Debug
+/Flogger.Web/obj/Debug
