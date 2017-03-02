@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using Serilog.Events;
 using System;
+using System.Configuration;
 
 namespace Flogging.Core
 {
@@ -48,8 +49,13 @@ namespace Flogging.Core
         }
         public static void WriteDiagnostic(FlogInfo infoToLog)
         {
+            var writeDiagnostics = Convert.ToBoolean(ConfigurationManager.AppSettings["EnableDiagnostics"]);
+            if (!writeDiagnostics)
+                return;
+            
             infoToLog.Timestamp = DateTime.Now;
             _diagnosticLogger.Write(LogEventLevel.Information, "{@FlogInfo}", infoToLog);
+                        
         }
 
         private static string GetMessageFromException(Exception ex)
