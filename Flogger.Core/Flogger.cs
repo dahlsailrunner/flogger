@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using Serilog.Events;
+using Serilog.Sinks.Elasticsearch;
 using System;
 using System.Configuration;
 
@@ -15,35 +16,64 @@ namespace Flogging.Core
         static Flogger()
         {
             _perfLogger = new LoggerConfiguration()
-                .WriteTo.File(path: "C:\\users\\edahl\\Source\\perf.log")
+                .WriteTo.File(formatter: new FloggerJsonFormatter("FlogInfo"), path: "C:\\users\\edahl\\Source\\perf.json")
+                .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
+                {
+                    AutoRegisterTemplate = true,
+                    CustomFormatter = new FloggerJsonFormatter("FlogInfo"),
+                    TypeName = "performance",  // assigned                    
+                    IndexFormat = "performance-{0:yyy.MM.dd}"
+
+                })
                 .CreateLogger();
 
             _usageLogger = new LoggerConfiguration()
-                .WriteTo.File(path: "C:\\users\\edahl\\Source\\usage.log")
+                .WriteTo.File(formatter: new FloggerJsonFormatter("FlogInfo"), path: "C:\\users\\edahl\\Source\\usage.json")
+                .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
+                {
+                    AutoRegisterTemplate = true,
+                    CustomFormatter = new FloggerJsonFormatter("FlogInfo"),
+                    TypeName = "usage",  // assigned                    
+                    IndexFormat = "usage-{0:yyy.MM.dd}"
+
+                })
                 .CreateLogger();
 
             _errorLogger = new LoggerConfiguration()
-                .WriteTo.File(path: "C:\\users\\edahl\\Source\\error.log")
+                .WriteTo.File(formatter: new FloggerJsonFormatter("FlogInfo"), path: "C:\\users\\edahl\\Source\\error.json")
+                .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
+                {
+                    AutoRegisterTemplate = true,
+                    CustomFormatter = new FloggerJsonFormatter("FlogInfo"),
+                    TypeName = "error",  // assigned                    
+                    IndexFormat = "error-{0:yyy.MM.dd}"
+
+                })
                 .CreateLogger();
 
             _diagnosticLogger = new LoggerConfiguration()
-                .WriteTo.File(path: "C:\\users\\edahl\\Source\\diagnostic.log")
+                .WriteTo.File(formatter: new FloggerJsonFormatter("FlogInfo"), path: "C:\\users\\edahl\\Source\\diagnostic.json")
+                .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
+                {
+                    AutoRegisterTemplate = true,
+                    CustomFormatter = new FloggerJsonFormatter("FlogInfo"),
+                    TypeName = "diagnostics",  // assigned                    
+                    IndexFormat = "diagnostics-{0:yyy.MM.dd}"
+
+                })
                 .CreateLogger();
         }
 
         public static void WritePerf(FlogInfo infoToLog)
         {
-            infoToLog.Timestamp = DateTime.Now;
             _perfLogger.Write(LogEventLevel.Information, "{@FlogInfo}", infoToLog);
         }
         public static void WriteUsage(FlogInfo infoToLog)
         {
-            infoToLog.Timestamp = DateTime.Now;
             _usageLogger.Write(LogEventLevel.Information, "{@FlogInfo}", infoToLog);
         }
         public static void WriteError(FlogInfo infoToLog)
         {
-            infoToLog.Timestamp = DateTime.Now;
             infoToLog.Message = GetMessageFromException(infoToLog.Exception);
             _errorLogger.Write(LogEventLevel.Information, "{@FlogInfo}", infoToLog);
         }
@@ -53,9 +83,7 @@ namespace Flogging.Core
             if (!writeDiagnostics)
                 return;
             
-            infoToLog.Timestamp = DateTime.Now;
             _diagnosticLogger.Write(LogEventLevel.Information, "{@FlogInfo}", infoToLog);
-                        
         }
 
         private static string GetMessageFromException(Exception ex)

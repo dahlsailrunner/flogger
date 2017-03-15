@@ -5,6 +5,11 @@ namespace Flogging.Core
 {
     public class FlogInfo
     {
+        public FlogInfo()
+        {
+            Timestamp = DateTime.Now;
+        }
+
         public string Product { get; set; }
         public string Layer { get; set; }
         public string Location { get; set; }
@@ -14,7 +19,7 @@ namespace Flogging.Core
         public int CustomerId { get; set; }
         public string CustomerName { get; set; }
         public string Message { get; set; }
-        internal DateTime Timestamp { get; set; }
+        public DateTime Timestamp { get; private set; }
         public string CorrelationId { get; set; }
         public long ElapsedMilliseconds { get; set; }
         public Dictionary<string, object> AdditionalInfo { get; set; }
